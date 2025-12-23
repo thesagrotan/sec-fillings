@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import {
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
 import type { Company } from '../types';
 import { CompanyDetailsModal } from './CompanyDetailsModal';
+import { ExternalLink, Building2, MapPin, DollarSign, Calendar, FileText } from 'lucide-react';
+import './CompaniesTable.css';
 
 interface Props {
     companies: Company[];
@@ -9,85 +17,152 @@ interface Props {
 export const CompaniesTable: React.FC<Props> = ({ companies }) => {
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
+    const columnHelper = createColumnHelper<Company>();
+
+    const columns = useMemo(() => [
+        columnHelper.accessor('name', {
+            header: 'Company',
+            cell: info => (
+                <div className="company-cell">
+                    <div className="company-name">{info.getValue()}</div>
+                    <div className="company-cik">CIK: {info.row.original.cik}</div>
+                </div>
+            ),
+        }),
+        columnHelper.accessor(row => row.city !== 'Unknown' ? `${row.city}, ${row.state}` : 'Unknown', {
+            id: 'location',
+            header: 'Location',
+            cell: info => (
+                <div className="location-cell">
+                    <MapPin size={14} className="cell-icon" />
+                    <span>{info.getValue()}</span>
+                </div>
+            )
+        }),
+        columnHelper.accessor('industry', {
+            header: 'Industry',
+            cell: info => (
+                <span className="industry-badge">
+                    {info.getValue()}
+                </span>
+            ),
+        }),
+        columnHelper.accessor('revenue_range', {
+            header: 'Revenue',
+            cell: info => (
+                <div className="revenue-cell">
+                    <DollarSign size={14} className="cell-icon" />
+                    <span>{info.getValue()}</span>
+                </div>
+            )
+        }),
+        columnHelper.accessor('amount_sold', {
+            header: 'Amount Raised',
+            cell: info => (
+                <span className="amount-raised">
+                    {info.getValue() && info.getValue() !== 'Unknown'
+                        ? `$${parseInt(info.getValue()).toLocaleString()}`
+                        : 'N/A'}
+                </span>
+            ),
+        }),
+        columnHelper.accessor('founded_year', {
+            header: 'Founded',
+            cell: info => (
+                <div className="founded-cell">
+                    <Building2 size={14} className="cell-icon" />
+                    <span>{info.getValue()}</span>
+                </div>
+            )
+        }),
+        columnHelper.accessor('latest_filing_date', {
+            header: 'Latest Filing',
+            cell: info => (
+                <div className="date-cell">
+                    <Calendar size={14} className="cell-icon" />
+                    <span>{info.getValue()}</span>
+                </div>
+            )
+        }),
+        columnHelper.display({
+            id: 'links',
+            header: 'Links',
+            cell: info => (
+                <div className="links-cell">
+                    {info.row.original.website_url && (
+                        <a
+                            href={info.row.original.website_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-button website-link"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Visit Website"
+                        >
+                            <ExternalLink size={14} />
+                        </a>
+                    )}
+                    {info.row.original.careers_url && (
+                        <a
+                            href={info.row.original.careers_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-button careers-link"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Careers Page"
+                        >
+                            <FileText size={14} />
+                        </a>
+                    )}
+                    {!info.row.original.website_url && !info.row.original.careers_url && (
+                        <span className="no-links">-</span>
+                    )}
+                </div>
+            ),
+        }),
+    ], [columnHelper]);
+
+    const table = useReactTable({
+        data: companies,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
+
     if (companies.length === 0) {
-        return <div className="text-center p-4 text-gray-400">No newly founded companies found. Try ingesting more data.</div>;
+        return <div className="empty-state">No newly founded companies found. Try ingesting more data.</div>;
     }
 
     return (
-        <div className="overflow-x-auto">
-            <table>
+        <div className="table-container">
+            <table className="modern-table">
                 <thead>
-                    <tr>
-                        <th>Company</th>
-                        <th>Location</th>
-                        <th>Industry</th>
-                        <th>Revenue</th>
-                        <th>Amount Raised</th>
-                        <th>Founded</th>
-                        <th>Latest Filing</th>
-                        <th>Links</th>
-                    </tr>
+                    {table.getHeaderGroups().map(headerGroup => (
+                        <tr key={headerGroup.id}>
+                            {headerGroup.headers.map(header => (
+                                <th key={header.id}>
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                        )}
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
                 </thead>
                 <tbody>
-                    {companies.map((company) => (
+                    {table.getRowModel().rows.map(row => (
                         <tr
-                            key={company.id}
-                            onClick={() => setSelectedCompany(company)}
-                            style={{ cursor: 'pointer' }}
+                            key={row.id}
+                            onClick={() => setSelectedCompany(row.original)}
+                            className="table-row"
                             title="Click to view details"
                         >
-                            <td>
-                                <div style={{ fontWeight: 600, color: 'white' }}>{company.name}</div>
-                                <div style={{ fontSize: '0.8rem', color: '#888' }}>{company.cik}</div>
-                            </td>
-                            <td>{company.city !== 'Unknown' ? `${company.city}, ${company.state}` : 'Unknown'}</td>
-                            <td>
-                                <span style={{
-                                    backgroundColor: '#374151',
-                                    padding: '0.2rem 0.6rem',
-                                    borderRadius: '1rem',
-                                    fontSize: '0.85rem'
-                                }}>
-                                    {company.industry}
-                                </span>
-                            </td>
-                            <td>{company.revenue_range}</td>
-                            <td style={{ fontWeight: 'bold' }}>
-                                {company.amount_sold && company.amount_sold !== 'Unknown'
-                                    ? `$${parseInt(company.amount_sold).toLocaleString()}`
-                                    : 'N/A'}
-                            </td>
-                            <td>{company.founded_year}</td>
-                            <td>{company.latest_filing_date}</td>
-                            <td>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    {company.website_url && (
-                                        <a
-                                            href={company.website_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            style={{ color: '#60a5fa', textDecoration: 'none', fontSize: '0.9em' }}
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Website
-                                        </a>
-                                    )}
-                                    {company.careers_url && (
-                                        <a
-                                            href={company.careers_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            style={{ color: '#42d392', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9em' }}
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            Careers
-                                        </a>
-                                    )}
-                                    {!company.website_url && !company.careers_url && (
-                                        <span style={{ color: '#666' }}>-</span>
-                                    )}
-                                </div>
-                            </td>
+                            {row.getVisibleCells().map(cell => (
+                                <td key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </td>
+                            ))}
                         </tr>
                     ))}
                 </tbody>

@@ -1,5 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import type { Company } from '../types';
+import { X, Building, MapPin, DollarSign, Calendar, FileText, Globe, Users, TrendingUp, Briefcase } from 'lucide-react';
+import './CompanyDetailsModal.css';
+import { IntelligenceCard } from './IntelligenceCard';
 
 interface Props {
     company: Company;
@@ -7,112 +10,128 @@ interface Props {
 }
 
 export const CompanyDetailsModal: React.FC<Props> = ({ company, onClose }) => {
-    const modalRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(false);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        const handleEscape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                onClose();
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        document.addEventListener('keydown', handleEscape);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('keydown', handleEscape);
-        };
+    const handleClose = useCallback(() => {
+        setIsVisible(false);
+        setTimeout(onClose, 300); // Wait for animation
     }, [onClose]);
 
+    useEffect(() => {
+        requestAnimationFrame(() => setIsVisible(true));
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') handleClose();
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [handleClose]);
+
     return (
-        <div className="modal-overlay">
-            <div className="modal-content" ref={modalRef}>
+        <div className={`modal-overlay ${isVisible ? 'visible' : ''}`} onClick={handleClose}>
+            <div
+                className={`modal-content ${isVisible ? 'visible' : ''}`}
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+            >
                 <div className="modal-header">
-                    <div className="modal-title">
-                        <h2>{company.name}</h2>
-                        <span>CIK: {company.cik}</span>
+                    <div className="modal-title-section">
+                        <div className="icon-wrapper">
+                            <Building size={24} />
+                        </div>
+                        <div>
+                            <h2>{company.name}</h2>
+                            <span className="cik-badge">CIK: {company.cik}</span>
+                        </div>
                     </div>
-                    <button className="close-button" onClick={onClose}>&times;</button>
+                    <button onClick={handleClose} className="close-button" aria-label="Close modal">
+                        <X size={20} />
+                    </button>
                 </div>
+
                 <div className="modal-body">
-                    <div className="detail-row">
-                        <span className="detail-label">Location</span>
-                        <span className="detail-value">
-                            {company.city !== 'Unknown' ? `${company.city}, ${company.state}` : 'Unknown Location'}
-                        </span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Industry</span>
-                        <span className="detail-value">{company.industry}</span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Revenue Range</span>
-                        <span className="detail-value" style={{ color: '#42d392' }}>{company.revenue_range}</span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Founded</span>
-                        <span className="detail-value">{company.founded_year}</span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Jurisdiction</span>
-                        <span className="detail-value">{company.jurisdiction}</span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Amount Sold</span>
-                        <span className="detail-value" style={{ fontWeight: 'bold' }}>
-                            {company.amount_sold && company.amount_sold !== 'Unknown'
-                                ? `$${parseInt(company.amount_sold).toLocaleString()}`
-                                : 'N/A'}
-                        </span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-label">Key Executive</span>
-                        <span className="detail-value">
-                            {company.executive_name !== 'Unknown'
-                                ? `${company.executive_name} (${company.executive_title})`
-                                : 'Unknown'}
-                        </span>
-                    </div>
-                    <div className="detail-row">
-                        <span className="detail-value">{company.latest_filing_date}</span>
-                    </div>
-                    {company.website_url && (
-                        <div className="detail-row">
-                            <span className="detail-label">Website</span>
-                            <span className="detail-value">
-                                <a
-                                    href={company.website_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ color: '#646cff', textDecoration: 'none' }}
-                                >
-                                    Visit Website &rarr;
-                                </a>
-                            </span>
+                    <div className="details-grid">
+                        <div className="detail-item">
+                            <div className="detail-icon"><MapPin size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Location</span>
+                                <span className="value">
+                                    {company.city !== 'Unknown' ? `${company.city}, ${company.state}` : 'Unknown Location'}
+                                </span>
+                            </div>
                         </div>
-                    )}
-                    {company.careers_url && (
-                        <div className="detail-row">
-                            <span className="detail-label">Careers</span>
-                            <span className="detail-value">
-                                <a
-                                    href={company.careers_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ color: '#42d392', textDecoration: 'none' }}
-                                >
-                                    View Careers Page &rarr;
-                                </a>
-                            </span>
+
+                        <div className="detail-item">
+                            <div className="detail-icon"><Briefcase size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Industry</span>
+                                <span className="value">{company.industry}</span>
+                            </div>
                         </div>
-                    )}
+
+                        <div className="detail-item">
+                            <div className="detail-icon"><DollarSign size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Revenue Range</span>
+                                <span className="value">{company.revenue_range}</span>
+                            </div>
+                        </div>
+
+                        <div className="detail-item">
+                            <div className="detail-icon"><TrendingUp size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Amount Sold</span>
+                                <span className="value accent-text">
+                                    {company.amount_sold && company.amount_sold !== 'Unknown'
+                                        ? `$${parseInt(company.amount_sold).toLocaleString()}`
+                                        : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="detail-item">
+                            <div className="detail-icon"><Calendar size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Founded</span>
+                                <span className="value">{company.founded_year}</span>
+                            </div>
+                        </div>
+
+                        <div className="detail-item">
+                            <div className="detail-icon"><FileText size={18} /></div>
+                            <div className="detail-content">
+                                <span className="label">Latest Filing</span>
+                                <span className="value">{company.latest_filing_date}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="modal-actions">
+                        {company.website_url && (
+                            <a
+                                href={company.website_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="action-button primary"
+                            >
+                                <Globe size={18} />
+                                Visit Website
+                            </a>
+                        )}
+                        {company.careers_url && (
+                            <a
+                                href={company.careers_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="action-button secondary"
+                            >
+                                <Users size={18} />
+                                View Careers
+                            </a>
+                        )}
+                    </div>
+
+                    <IntelligenceCard company={company} />
                 </div>
             </div>
         </div>

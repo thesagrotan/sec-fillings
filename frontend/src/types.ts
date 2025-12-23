@@ -14,4 +14,13 @@ export interface Company {
     executive_title: string;
     website_url?: string;
     careers_url?: string;
+
+    // Intelligence Signals (stored as JSON strings)
+    maturity_info?: string;
+    funding_details?: string;
+    founder_analysis?: string;
+    public_presence_quality?: string;
+    hiring_signal?: string;
+    design_opportunity?: string;
+    engagement_recommendation?: string;
 }

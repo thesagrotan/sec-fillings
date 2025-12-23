@@ -28,3 +28,12 @@ class Company(Base):
     website_url = Column(String)
     careers_url = Column(String)
     
+    # New Intelligence Signals
+    maturity_info = Column(String) # JSON
+    funding_details = Column(String) # JSON
+    founder_analysis = Column(String) # JSON
+    public_presence_quality = Column(String) # JSON
+    hiring_signal = Column(String) # JSON
+    design_opportunity = Column(String) # JSON
+    engagement_recommendation = Column(String)
+

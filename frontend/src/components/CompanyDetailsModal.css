@@ -1,0 +1,199 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(0px);
+    transition: all 0.3s ease-out;
+    pointer-events: none;
+}
+
+.modal-overlay.visible {
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.modal-content.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: rgba(30, 41, 59, 0.3);
+}
+
+.modal-title-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--brand-primary);
+    border-radius: var(--radius-lg);
+}
+
+.modal-title-section h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.cik-badge {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    background-color: var(--bg-primary);
+    padding: 0.125rem 0.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-subtle);
+    margin-top: 0.25rem;
+    display: inline-block;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.detail-icon {
+    color: var(--text-tertiary);
+    margin-top: 0.125rem;
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: 0.25rem;
+}
+
+.value {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.value.accent-text {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.action-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.action-button.primary {
+    background-color: var(--brand-primary);
+    color: white;
+}
+
+.action-button.primary:hover {
+    background-color: var(--brand-hover);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.action-button.secondary {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+}
+
+.action-button.secondary:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+}

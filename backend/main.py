@@ -2,6 +2,8 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .models import Base, engine, SessionLocal, Company
 from .ingestion import ingest_filings
+from .config import EXCLUDED_INDUSTRIES
+from sqlalchemy.orm import Session
 
 app = FastAPI(title="Startup Discovery API") 
 
@@ -44,7 +46,7 @@ def get_companies(
     limit: int = 100,
     days_ago: int = None,
     startup_mode: bool = False,
-    db: SessionLocal = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     query = db.query(Company)
     
@@ -56,30 +58,11 @@ def get_companies(
         query = query.filter(Company.state == state)
     if revenue_range:
         query = query.filter(Company.revenue_range == revenue_range)
-    if revenue_range:
-        query = query.filter(Company.revenue_range == revenue_range)
     if founded_year:
         query = query.filter(Company.founded_year == founded_year)
 
     if startup_mode:
-        excluded_industries = [
-            "Pooled Investment Fund",
-            "REITS and Finance",
-            "Oil and Gas",
-            "Commercial",
-            "Other Real Estate",
-            "Real Estate",
-            "Commercial Banking",
-            "Insurance",
-            "Investing",
-            "Investment Banking",
-            "Coal Mining",
-            "Electric Utilities",
-            "Construction",
-            "Residential",
-            "Restaurants"
-        ]
-        query = query.filter(Company.industry.notin_(excluded_industries))
+        query = query.filter(Company.industry.notin_(EXCLUDED_INDUSTRIES))
     
     if days_ago is not None:
         from datetime import date, timedelta

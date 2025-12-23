@@ -13,12 +13,28 @@ cursor = conn.cursor()
 cursor.execute("PRAGMA table_info(companies)")
 columns = [info[1] for info in cursor.fetchall()]
 
-if "careers_url" not in columns:
-    print("Adding careers_url column...")
-    cursor.execute("ALTER TABLE companies ADD COLUMN careers_url VARCHAR")
-    conn.commit()
-    print("Column added.")
-else:
-    print("Column careers_url already exists.")
+
+columns_to_add = {
+    "careers_url": "VARCHAR",
+    "maturity_info": "VARCHAR",
+    "funding_details": "VARCHAR",
+    "founder_analysis": "VARCHAR",
+    "public_presence_quality": "VARCHAR",
+    "hiring_signal": "VARCHAR",
+    "design_opportunity": "VARCHAR",
+    "engagement_recommendation": "VARCHAR"
+}
+
+for col_name, col_type in columns_to_add.items():
+    if col_name not in columns:
+        print(f"Adding {col_name} column...")
+        try:
+            cursor.execute(f"ALTER TABLE companies ADD COLUMN {col_name} {col_type}")
+            conn.commit()
+            print(f"Column {col_name} added.")
+        except Exception as e:
+            print(f"Error adding {col_name}: {e}")
+    else:
+        print(f"Column {col_name} already exists.")
 
 conn.close()
