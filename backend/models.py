@@ -36,4 +36,7 @@ class Company(Base):
     hiring_signal = Column(String) # JSON
     design_opportunity = Column(String) # JSON
     engagement_recommendation = Column(String)
+    
+    # AI Enrichment Status
+    enrichment_status = Column(String, default="pending")  # pending, processing, completed, failed
 

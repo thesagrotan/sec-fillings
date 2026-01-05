@@ -23,4 +23,7 @@ export interface Company {
     hiring_signal?: string;
     design_opportunity?: string;
     engagement_recommendation?: string;
+
+    // AI Enrichment Status
+    enrichment_status?: 'pending' | 'processing' | 'completed' | 'failed';
 }

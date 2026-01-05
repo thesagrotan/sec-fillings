@@ -44,3 +44,8 @@ URL_BLOCKLIST = [
     'sec.gov', 'edgar-online.com', 'sec.report',
     'microsoft.com', 'amazon.com', 'googleapis.com', 'docs.google.com'
 ]
+
+# OpenRouter AI Configuration
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "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")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")

@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-table';
 import type { Company } from '../types';
 import { CompanyDetailsModal } from './CompanyDetailsModal';
+import { EnrichmentBadge } from './EnrichmentBadge';
 import { ExternalLink, Building2, MapPin, DollarSign, Calendar, FileText } from 'lucide-react';
 import './CompaniesTable.css';
 
@@ -82,6 +83,12 @@ export const CompaniesTable: React.FC<Props> = ({ companies }) => {
                     <Calendar size={14} className="cell-icon" />
                     <span>{info.getValue()}</span>
                 </div>
+            )
+        }),
+        columnHelper.accessor('enrichment_status', {
+            header: 'AI Status',
+            cell: info => (
+                <EnrichmentBadge status={info.getValue()} size="sm" />
             )
         }),
         columnHelper.display({

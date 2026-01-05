@@ -33,3 +33,18 @@ export const triggerIngest = async (limit: number = 10): Promise<{ message: stri
     const response = await axios.post(`${API_URL}/ingest?limit=${limit}`);
     return response.data;
 };
+
+export const triggerEnrichment = async (companyId: number): Promise<{ status: string; company_id: number }> => {
+    const response = await axios.post(`${API_URL}/companies/${companyId}/enrich`);
+    return response.data;
+};
+
+export const fetchEnrichmentStatus = async (companyId: number): Promise<{ company_id: number; enrichment_status: string }> => {
+    const response = await axios.get(`${API_URL}/companies/${companyId}/enrichment-status`);
+    return response.data;
+};
+
+export const triggerEnrichAll = async (): Promise<{ status: string; message: string }> => {
+    const response = await axios.post(`${API_URL}/enrich-all`);
+    return response.data;
+};

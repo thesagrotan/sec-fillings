@@ -3,6 +3,7 @@ import type { Company } from '../types';
 import { X, Building, MapPin, DollarSign, Calendar, FileText, Globe, Users, TrendingUp, Briefcase } from 'lucide-react';
 import './CompanyDetailsModal.css';
 import { IntelligenceCard } from './IntelligenceCard';
+import { EnrichmentBadge } from './EnrichmentBadge';
 
 interface Props {
     company: Company;
@@ -41,7 +42,10 @@ export const CompanyDetailsModal: React.FC<Props> = ({ company, onClose }) => {
                         </div>
                         <div>
                             <h2>{company.name}</h2>
-                            <span className="cik-badge">CIK: {company.cik}</span>
+                            <div className="modal-badges">
+                                <span className="cik-badge">CIK: {company.cik}</span>
+                                <EnrichmentBadge status={company.enrichment_status} size="sm" />
+                            </div>
                         </div>
                     </div>
                     <button onClick={handleClose} className="close-button" aria-label="Close modal">
